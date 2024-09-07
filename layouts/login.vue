@@ -1,6 +1,6 @@
 <template>
   <v-app class="m-0">
-    <v-main class="d-flex align-center justify-center primary">
+    <v-main class="background-image d-flex align-center justify-center">
       <v-container fluid>
         <nuxt />
       </v-container>
@@ -9,12 +9,12 @@
 </template>
 
 <style>
-/* .background-image {
-  background-image: url("https://tuxglobalinstitute.edu.kh/wp-content/uploads/2023/09/357348114_789134286333561_3404176784431070208_n.jpg");
-  background-color: rgba(34, 61, 169, 0.8);
+.background-image {
+  background-image: url("/images/login-background.jpg");
+  background-color: rgba(1, 1, 1, 0.5);
   background-blend-mode: overlay;
   background-size: cover;
   background-position: center;
   overflow: hidden;
-} */
+}
 </style>

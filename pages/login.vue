@@ -1,5 +1,5 @@
 <template>
-  <v-sheet class="pa-12 primary" rounded>
+  <v-sheet class="pa-12" color="transparent" rounded>
     <v-card class="mx-auto px-6 py-8 rounded-lg" max-width="400">
       <v-col class="d-flex flex-row align-center justify-center pa-0">
         <v-img
