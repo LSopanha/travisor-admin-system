@@ -2,7 +2,7 @@
   <v-container>
     <v-col cols="12" class="pa-0">
       <h2 class="secondary--text text-decoration-underline my-3">
-        User management
+        User Management
       </h2>
       <v-chip-group
         mandatory
@@ -21,16 +21,16 @@
           class="justify-center"
           style="width: 125px"
           outlined
-          value="user"
+          value="client"
         >
-          <v-icon class="mr-1">mdi-account</v-icon>User
+          <v-icon class="mr-1">mdi-account</v-icon> Client
         </v-chip>
       </v-chip-group>
     </v-col>
 
     <travisor-data-table
       v-if="selectedTab === 'admin' && admins.length"
-      :title="'admin'"
+      :title="'Admin'"
       :items="admins"
       :headers="headers"
       :isLoading="isLoading"
@@ -42,16 +42,16 @@
     ></travisor-data-table>
 
     <travisor-data-table
-      v-if="selectedTab === 'user' && users.length"
-      :title="'user'"
-      :items="users"
+      v-if="selectedTab === 'client' && clients.length"
+      :title="'Client'"
+      :items="clients"
       :headers="headers"
       :isLoading="isLoading"
-      @add-click="handleUserAddClick"
-      @view-click="handleUserViewClick"
-      @edit-click="handleUserEditClick"
-      @deactivate-click="handleUserDeactivateClick"
-      @activate-click="handleUserActivateClick"
+      @add-click="handleClientAddClick"
+      @view-click="handleClientViewClick"
+      @edit-click="handleClientEditClick"
+      @deactivate-click="handleClientDeactivateClick"
+      @activate-click="handleClientActivateClick"
     ></travisor-data-table>
   </v-container>
 </template>
@@ -73,33 +73,36 @@ export default {
         { text: "Gender", value: "gender" },
         { text: "Phone", value: "phone" },
         { text: "Email", value: "email" },
+        { text: "Profile", value: "profile_picture" },
+        { text: "Status", value: "active" },
       ],
       isLoading: true,
     };
   },
 
-  mounted() {
-    // this.getUsers();
-    this.getAdmins();
-  },
-
   computed: {
     ...mapState(useUserStore, {
-      users: "users",
+      clients: "clients",
       admins: "admins",
     }),
   },
 
+  mounted() {
+    this.getAdmins();
+    this.getClients();
+  },
+
   methods: {
-    async getUsers() {
+    async getClients() {
       try {
-        await this.userStore.fetchUsers();
+        await this.userStore.fetchClients();
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error("Error fetching clients:", error);
       } finally {
         this.isLoading = false;
       }
     },
+
     async getAdmins() {
       try {
         await this.userStore.fetchAdmins();
@@ -114,12 +117,23 @@ export default {
     handleAdminAddClick() {
       this.$router.push("/user/add");
     },
-    handleAdminViewClick() {
-      this.$router.push("/user/show");
+
+    handleAdminViewClick(id) {
+      this.$router.push({
+        name: "user-show",
+        params: { id },
+        query: { id, type: "admin" },
+      });
     },
+
     handleAdminEditClick(id) {
-      this.$router.push({ name: "user-edit", params: { id } });
+      this.$router.push({
+        name: "user-edit",
+        params: { id },
+        query: { id, type: "admin" },
+      });
     },
+
     async handleAdminDeactivateClick(id) {
       try {
         const response = await this.userStore.deactivateUser("admins", id);
@@ -134,6 +148,7 @@ export default {
         this.handleError(error);
       }
     },
+
     async handleAdminActivateClick(id) {
       try {
         const response = await this.userStore.activateUser("admins", id);
@@ -148,23 +163,27 @@ export default {
         this.handleError(error);
       }
     },
-    async handleAdminBanClick(id) {
-      try {
-        const response = await this.userStore.banUser("admins", id);
-        if (response.data && response.data.message) {
-          this.$swal.fire({
-            title: "Success!",
-            text: response.data.message,
-            icon: "success",
-          });
-        }
-      } catch (error) {
-        this.handleError(error);
-      }
+
+    // Client action handlers
+    handleClientAddClick() {
+      this.$router.push("/user/add");
     },
-    async handleAdminAuthorizeClick(id) {
+
+    handleClientViewClick() {
+      this.$router.push("/user/show");
+    },
+
+    handleClientEditClick(id) {
+      this.$router.push({
+        name: "user-edit",
+        params: { id },
+        query: { id, type: "client" },
+      });
+    },
+
+    async handleClientDeactivateClick(id) {
       try {
-        const response = await this.userStore.authorizeUser("admins", id);
+        const response = await this.userStore.deactivateUser("clients", id);
         if (response.data && response.data.message) {
           this.$swal.fire({
             title: "Success!",
@@ -177,61 +196,9 @@ export default {
       }
     },
 
-    // User action handlers
-    handleUserAddClick() {
-      this.$router.push("/user/add");
-    },
-    handleUserViewClick() {
-      this.$router.push("/user/show");
-    },
-    handleUserEditClick(id) {
-      this.$router.push({ name: "user-edit", params: { id } });
-    },
-    async handleUserDeactivateClick(id) {
+    async handleClientActivateClick(id) {
       try {
-        const response = await this.userStore.deactivateUser("users", id);
-        if (response.data && response.data.message) {
-          this.$swal.fire({
-            title: "Success!",
-            text: response.data.message,
-            icon: "success",
-          });
-        }
-      } catch (error) {
-        this.handleError(error);
-      }
-    },
-    async handleUserActivateClick(id) {
-      try {
-        const response = await this.userStore.activateUser("users", id);
-        if (response.data && response.data.message) {
-          this.$swal.fire({
-            title: "Success!",
-            text: response.data.message,
-            icon: "success",
-          });
-        }
-      } catch (error) {
-        this.handleError(error);
-      }
-    },
-    async handleUserBanClick(id) {
-      try {
-        const response = await this.userStore.banUser("users", id);
-        if (response.data && response.data.message) {
-          this.$swal.fire({
-            title: "Success!",
-            text: response.data.message,
-            icon: "success",
-          });
-        }
-      } catch (error) {
-        this.handleError(error);
-      }
-    },
-    async handleUserAuthorizeClick(id) {
-      try {
-        const response = await this.userStore.authorizeUser("users", id);
+        const response = await this.userStore.activateUser("clients", id);
         if (response.data && response.data.message) {
           this.$swal.fire({
             title: "Success!",
@@ -263,3 +230,5 @@ export default {
   },
 };
 </script>
+
+<style scoped></style>
