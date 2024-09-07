@@ -3,7 +3,7 @@
     <v-col cols="12" class="pa-0 d-flex justify-end">
       <div class="my-2">
         <v-btn
-          class="white text-capitalize font-weight-bold pb-2"
+          class="white text-capitalize font-weight-bold py-4"
           v-show="showAdd"
           @click="onAddClick"
           small
@@ -18,73 +18,58 @@
     <div>
       <v-card elevation="2" class="pa-0 rounded-xl" outlined>
         <v-data-table
-          :headers="headers"
+          :headers="headersWithActions"
           :items="items"
           loading-text="Loading... Please wait."
           item-key="id"
+          class="elevation-1"
         >
-          <template v-slot:item="{ item }">
-            <v-tooltip bottom v-show="showActivate" v-if="item.active === 1">
+          <template v-slot:item.actions="{ item }">
+            <v-tooltip bottom v-if="showView">
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon
+                  @click="onViewClick(item.global_id)"
+                  class="mx-1"
+                  color="grey"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  mdi-eye
+                </v-icon>
+              </template>
+              <span>View</span>
+            </v-tooltip>
+
+            <v-tooltip bottom v-if="showActivate && item.active === 1">
               <template v-slot:activator="{ on, attrs }">
                 <v-icon
                   @click="onDeactivateClick(item.global_id)"
                   class="mx-1"
-                  color="green"
+                  :color="item.loading ? 'grey' : 'green'"
                   v-bind="attrs"
                   v-on="on"
                 >
                   mdi-account-check
                 </v-icon>
               </template>
-              <span>Activate</span>
+              <span>Deactivate</span>
             </v-tooltip>
-            <v-tooltip
-              bottom
-              v-show="showDeactivate"
-              v-else-if="item.active === 0"
-            >
+
+            <v-tooltip bottom v-if="showDeactivate && item.active === 0">
               <template v-slot:activator="{ on, attrs }">
                 <v-icon
                   @click="onActivateClick(item.global_id)"
                   class="mx-1"
-                  color="red"
+                  :color="item.loading ? 'grey' : 'red'"
                   v-bind="attrs"
                   v-on="on"
                 >
                   mdi-account-off
                 </v-icon>
               </template>
-              <span>Deactivate</span>
+              <span>Activate</span>
             </v-tooltip>
 
-            <v-tooltip bottom v-show="showAuthorize" v-if="item.ban === 0">
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon
-                  @click="onBanClick(item.global_id)"
-                  class="mx-1"
-                  color="green"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  mdi-account-key
-                </v-icon>
-              </template>
-              <span>Authorize</span>
-            </v-tooltip>
-            <v-tooltip bottom v-show="showBan" v-else-if="item.ban === 1">
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon
-                  @click="onAuthorizeClick(item.global_id)"
-                  class="mx-1"
-                  color="red"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  mdi-account-remove
-                </v-icon>
-              </template>
-              <span>Ban</span>
-            </v-tooltip>
             <v-tooltip bottom v-if="showEdit">
               <template v-slot:activator="{ on, attrs }">
                 <v-icon
@@ -98,20 +83,6 @@
                 </v-icon>
               </template>
               <span>Edit</span>
-            </v-tooltip>
-            <v-tooltip bottom v-if="showInvoice">
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon
-                  @click="onInvoiceClick(item.global_id)"
-                  class="mx-1"
-                  color="primary"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  mdi-invoice-list-outline
-                </v-icon>
-              </template>
-              <span>Invoice</span>
             </v-tooltip>
           </template>
         </v-data-table>
@@ -127,18 +98,12 @@ export default {
       type: String,
       default: "",
     },
-
     items: {
       type: Array,
       required: true,
     },
     headers: {
       type: Array,
-      required: true,
-    },
-    isLoading: {
-      type: Boolean,
-      default: false,
       required: true,
     },
   },
@@ -151,6 +116,9 @@ export default {
     },
     showAdd() {
       return !!this.$listeners["add-click"];
+    },
+    showView() {
+      return !!this.$listeners["view-click"];
     },
     showEdit() {
       return !!this.$listeners["edit-click"];
@@ -175,23 +143,50 @@ export default {
     onAddClick() {
       this.$emit("add-click");
     },
+    onViewClick(id) {
+      this.$emit("view-click", id);
+    },
     onEditClick(id) {
       this.$emit("edit-click", id);
     },
-    onInvoiceClick(id) {
-      this.$emit("invoice-click", id);
+    async onDeactivateClick(id) {
+      this.updateItemStatus(id, 0, "deactivate-click");
     },
-    onDeactivateClick(id) {
-      this.$emit("deactivate-click", id);
+    async onActivateClick(id) {
+      this.updateItemStatus(id, 1, "activate-click");
     },
-    onActivateClick(id) {
-      this.$emit("activate-click", id);
+    async updateItemStatus(id, status, event) {
+      const index = this.items.findIndex((item) => item.global_id === id);
+      if (index !== -1) {
+        // Set loading state to true
+        this.$set(this.items, index, { ...this.items[index], loading: true });
+        try {
+          this.$emit(event, id);
+          // Simulate a delay for demonstration purposes
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          // Update the item with the new status
+          this.$set(this.items, index, {
+            ...this.items[index],
+            active: status,
+            loading: false,
+          });
+        } catch (error) {
+          console.error("Error updating item:", error);
+          // Reset loading state in case of an error
+          this.$set(this.items, index, {
+            ...this.items[index],
+            loading: false,
+          });
+        }
+      }
     },
-    onBanClick(id) {
-      this.$emit("ban-click", id);
-    },
-    onAuthorizeClick(id) {
-      this.$emit("authorize-click", id);
+  },
+  watch: {
+    items: {
+      handler(newItems) {
+        console.log("Items updated:", newItems);
+      },
+      deep: true,
     },
   },
 };

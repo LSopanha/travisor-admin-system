@@ -10,7 +10,7 @@
     >
       <v-list>
         <v-list-item
-          class="white--text px-6"
+          class="white--text"
           v-for="(item, i) in items"
           :key="i"
           :to="item.to"

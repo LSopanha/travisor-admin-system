@@ -3,7 +3,9 @@ import { defineStore } from 'pinia';
 export const useUserStore = defineStore('user', {
   state: () => ({
     users: [],
+    admins: [],
     user: {},
+    admin: {},
     instructor: {},
     roles : []
   }),
@@ -20,11 +22,19 @@ export const useUserStore = defineStore('user', {
     setUser(user) {
       this.user = user;
     },
-    setInstructor(instructor) {
-      this.instructor = instructor;
+    setAdmins(admins) {
+      this.admins = admins;
     },
-    async fetchUsers(api) {
-      const response = await this.$axios.get(`${api}`);
+    setAdmin(admin) {
+      this.admin = admin;
+    },
+    async fetchAdmins() {
+      const response = await this.$axios.get('admins');
+      this.setAdmins(response.data.data); 
+      return response;
+    },
+    async fetchUsers() {
+      const response = await this.$axios.get('users');
       this.setUsers(response.data.data); 
       return response;
     },

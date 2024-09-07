@@ -29,31 +29,29 @@
     </v-col>
 
     <travisor-data-table
-      v-if="selectedTab == 'admin'"
+      v-if="selectedTab === 'admin' && admins.length"
       :title="'admin'"
       :items="admins"
       :headers="headers"
       :isLoading="isLoading"
       @add-click="handleAdminAddClick"
+      @view-click="handleAdminViewClick"
       @edit-click="handleAdminEditClick"
       @deactivate-click="handleAdminDeactivateClick"
       @activate-click="handleAdminActivateClick"
-      @ban-click="handleAdminBanClick"
-      @authorize-click="handleAdminAuthorizeClick"
     ></travisor-data-table>
 
     <travisor-data-table
-      v-if="selectedTab == 'user'"
+      v-if="selectedTab === 'user' && users.length"
       :title="'user'"
       :items="users"
       :headers="headers"
       :isLoading="isLoading"
       @add-click="handleUserAddClick"
+      @view-click="handleUserViewClick"
       @edit-click="handleUserEditClick"
       @deactivate-click="handleUserDeactivateClick"
       @activate-click="handleUserActivateClick"
-      @ban-click="handleUserBanClick"
-      @authorize-click="handleUserAuthorizeClick"
     ></travisor-data-table>
   </v-container>
 </template>
@@ -75,17 +73,13 @@ export default {
         { text: "Gender", value: "gender" },
         { text: "Phone", value: "phone" },
         { text: "Email", value: "email" },
-        { text: "Role", value: "role.role" },
-        { text: "Created At", value: "created_at" },
-        { text: "Updated At", value: "updated_at" },
-        { text: "Actions", value: "actions", sortable: false },
       ],
       isLoading: true,
     };
   },
 
   mounted() {
-    this.getUsers();
+    // this.getUsers();
     this.getAdmins();
   },
 
@@ -99,7 +93,7 @@ export default {
   methods: {
     async getUsers() {
       try {
-        await this.userStore.fetchUsers("users");
+        await this.userStore.fetchUsers();
       } catch (error) {
         console.error("Error fetching users:", error);
       } finally {
@@ -108,7 +102,7 @@ export default {
     },
     async getAdmins() {
       try {
-        await this.userStore.fetchUsers("admins");
+        await this.userStore.fetchAdmins();
       } catch (error) {
         console.error("Error fetching admins:", error);
       } finally {
@@ -118,10 +112,13 @@ export default {
 
     // Admin action handlers
     handleAdminAddClick() {
-      this.$router.push("/admin/add");
+      this.$router.push("/user/add");
+    },
+    handleAdminViewClick() {
+      this.$router.push("/user/show");
     },
     handleAdminEditClick(id) {
-      this.$router.push({ name: "admin-edit", params: { id } });
+      this.$router.push({ name: "user-edit", params: { id } });
     },
     async handleAdminDeactivateClick(id) {
       try {
@@ -183,6 +180,9 @@ export default {
     // User action handlers
     handleUserAddClick() {
       this.$router.push("/user/add");
+    },
+    handleUserViewClick() {
+      this.$router.push("/user/show");
     },
     handleUserEditClick(id) {
       this.$router.push({ name: "user-edit", params: { id } });
