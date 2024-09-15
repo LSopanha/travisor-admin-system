@@ -24,63 +24,85 @@
           item-key="id"
           class="elevation-1"
         >
+          <!-- Profile Picture Slot -->
+          <template v-slot:item.profile_picture="{ item }">
+            <v-img
+              :src="item.profile_picture"
+              max-height="35"
+              max-width="35"
+              alt="Profile Picture"
+              class="rounded-circle"
+            ></v-img>
+          </template>
+
+          <!-- Status Slot -->
+          <template v-slot:item.active="{ item }">
+            <div class="text-center" v-show="showDeactivate || showActivate">
+              <v-chip
+                class="white--text pa-0 d-flex justify-center align-center"
+                label
+                color="green"
+                style="width: 100px"
+                @click="onDeactivateClick(item.global_id)"
+                v-if="item.active == 1"
+              >
+                Activated
+              </v-chip>
+              <v-chip
+                class="white--text pa-0 d-flex justify-center align-center"
+                label
+                color="red"
+                style="width: 100px"
+                @click="onActivateClick(item.global_id)"
+                v-else
+              >
+                Deactivated
+              </v-chip>
+            </div>
+          </template>
+
+          <!-- Actions Slot -->
           <template v-slot:item.actions="{ item }">
             <v-tooltip bottom v-if="showView">
               <template v-slot:activator="{ on, attrs }">
-                <v-icon
-                  @click="onViewClick(item.global_id)"
-                  class="mx-1"
-                  color="grey"
-                  v-bind="attrs"
-                  v-on="on"
+                <v-chip
+                  class="text-center pa-0 px-1"
+                  label
+                  color="cyan"
+                  style="height: 35px"
                 >
-                  mdi-eye
-                </v-icon>
+                  <v-icon
+                    @click="onViewClick(item.global_id)"
+                    class="mx-1"
+                    color="white"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    mdi-eye
+                  </v-icon>
+                </v-chip>
               </template>
               <span>View</span>
             </v-tooltip>
 
-            <v-tooltip bottom v-if="showActivate && item.active === 1">
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon
-                  @click="onDeactivateClick(item.global_id)"
-                  class="mx-1"
-                  :color="item.loading ? 'grey' : 'green'"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  mdi-account-check
-                </v-icon>
-              </template>
-              <span>Deactivate</span>
-            </v-tooltip>
-
-            <v-tooltip bottom v-if="showDeactivate && item.active === 0">
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon
-                  @click="onActivateClick(item.global_id)"
-                  class="mx-1"
-                  :color="item.loading ? 'grey' : 'red'"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  mdi-account-off
-                </v-icon>
-              </template>
-              <span>Activate</span>
-            </v-tooltip>
-
             <v-tooltip bottom v-if="showEdit">
               <template v-slot:activator="{ on, attrs }">
-                <v-icon
-                  @click="onEditClick(item.global_id)"
-                  class="mx-1"
-                  color="primary"
-                  v-bind="attrs"
-                  v-on="on"
+                <v-chip
+                  class="text-center pa-0 px-1"
+                  label
+                  color="orange"
+                  style="height: 35px"
                 >
-                  mdi-pencil
-                </v-icon>
+                  <v-icon
+                    @click="onEditClick(item.global_id)"
+                    class="mx-1"
+                    color="white"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    mdi-pencil
+                  </v-icon>
+                </v-chip>
               </template>
               <span>Edit</span>
             </v-tooltip>
@@ -123,20 +145,11 @@ export default {
     showEdit() {
       return !!this.$listeners["edit-click"];
     },
-    showInvoice() {
-      return !!this.$listeners["invoice-click"];
-    },
     showDeactivate() {
       return !!this.$listeners["deactivate-click"];
     },
     showActivate() {
       return !!this.$listeners["activate-click"];
-    },
-    showBan() {
-      return !!this.$listeners["ban-click"];
-    },
-    showAuthorize() {
-      return !!this.$listeners["authorize-click"];
     },
   },
   methods: {
@@ -150,43 +163,10 @@ export default {
       this.$emit("edit-click", id);
     },
     async onDeactivateClick(id) {
-      this.updateItemStatus(id, 0, "deactivate-click");
+      this.$emit("deactivate-click", id, 0);
     },
     async onActivateClick(id) {
-      this.updateItemStatus(id, 1, "activate-click");
-    },
-    async updateItemStatus(id, status, event) {
-      const index = this.items.findIndex((item) => item.global_id === id);
-      if (index !== -1) {
-        // Set loading state to true
-        this.$set(this.items, index, { ...this.items[index], loading: true });
-        try {
-          this.$emit(event, id);
-          // Simulate a delay for demonstration purposes
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          // Update the item with the new status
-          this.$set(this.items, index, {
-            ...this.items[index],
-            active: status,
-            loading: false,
-          });
-        } catch (error) {
-          console.error("Error updating item:", error);
-          // Reset loading state in case of an error
-          this.$set(this.items, index, {
-            ...this.items[index],
-            loading: false,
-          });
-        }
-      }
-    },
-  },
-  watch: {
-    items: {
-      handler(newItems) {
-        console.log("Items updated:", newItems);
-      },
-      deep: true,
+      this.$emit("activate-click", id, 1);
     },
   },
 };

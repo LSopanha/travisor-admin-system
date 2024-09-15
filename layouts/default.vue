@@ -93,12 +93,12 @@ export default {
         {
           icon: "mdi-account",
           title: "User",
-          to: "/user",
+          to: "/user?tab=admin",
         },
         {
           icon: "mdi-folder-multiple",
           title: "Category",
-          to: "/category",
+          to: "/category?tab=continent",
         },
         {
           icon: "mdi-map-legend",
