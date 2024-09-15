@@ -4,6 +4,8 @@
       <h2 class="secondary--text text-decoration-underline my-3">
         User Management
       </h2>
+
+      <!-- Chip group to toggle between Admin and Client -->
       <v-chip-group
         mandatory
         active-class="primary--text"
@@ -28,10 +30,11 @@
       </v-chip-group>
     </v-col>
 
+    <!-- Admin Table -->
     <travisor-data-table
       v-if="selectedTab === 'admin' && admins.length"
       :title="'Admin'"
-      :items="admins"
+      :items="adminsWithIds"
       :headers="headers"
       :isLoading="isLoading"
       @add-click="handleAdminAddClick"
@@ -41,10 +44,11 @@
       @activate-click="handleAdminActivateClick"
     ></travisor-data-table>
 
+    <!-- Client Table -->
     <travisor-data-table
       v-if="selectedTab === 'client' && clients.length"
       :title="'Client'"
-      :items="clients"
+      :items="clientsWithIds"
       :headers="headers"
       :isLoading="isLoading"
       @add-click="handleClientAddClick"
@@ -80,11 +84,46 @@ export default {
     };
   },
 
+  created() {
+    const queryTab = this.$route.query.tab;
+    if (queryTab === "client" || queryTab === "admin") {
+      this.selectedTab = queryTab;
+    }
+  },
+
+  watch: {
+    selectedTab(newTab) {
+      if (this.$route.query.tab !== newTab) {
+        this.$router.push({ query: { ...this.$route.query, tab: newTab } });
+      }
+    },
+
+    "$route.query.tab": {
+      immediate: true,
+      handler(newTab) {
+        if (newTab === "client" || newTab === "admin") {
+          this.selectedTab = newTab;
+        }
+      },
+    },
+  },
+
   computed: {
     ...mapState(useUserStore, {
       clients: "clients",
       admins: "admins",
     }),
+
+    adminsWithIds() {
+      return this.admins.map((admin, index) => ({ ...admin, id: index + 1 }));
+    },
+
+    clientsWithIds() {
+      return this.clients.map((client, index) => ({
+        ...client,
+        id: index + 1,
+      }));
+    },
   },
 
   mounted() {
@@ -113,16 +152,18 @@ export default {
       }
     },
 
-    // Admin action handlers
     handleAdminAddClick() {
-      this.$router.push("/user/add");
+      this.$router.push({
+        name: "user-add",
+        query: { tab: "admin", type: "admin" },
+      });
     },
 
     handleAdminViewClick(id) {
       this.$router.push({
         name: "user-show",
         params: { id },
-        query: { id, type: "admin" },
+        query: { tab: "admin", adminId: id, type: "admin" },
       });
     },
 
@@ -130,7 +171,7 @@ export default {
       this.$router.push({
         name: "user-edit",
         params: { id },
-        query: { id, type: "admin" },
+        query: { tab: "admin", adminId: id, type: "admin" },
       });
     },
 
@@ -143,6 +184,7 @@ export default {
             text: response.data.message,
             icon: "success",
           });
+          this.getAdmins();
         }
       } catch (error) {
         this.handleError(error);
@@ -158,26 +200,33 @@ export default {
             text: response.data.message,
             icon: "success",
           });
+          this.getAdmins();
         }
       } catch (error) {
         this.handleError(error);
       }
     },
 
-    // Client action handlers
     handleClientAddClick() {
-      this.$router.push("/user/add");
+      this.$router.push({
+        name: "user-add",
+        query: { tab: "client", type: "client" },
+      });
     },
 
-    handleClientViewClick() {
-      this.$router.push("/user/show");
+    handleClientViewClick(id) {
+      this.$router.push({
+        name: "user-show",
+        params: { id },
+        query: { tab: "client", clientId: id, type: "client" },
+      });
     },
 
     handleClientEditClick(id) {
       this.$router.push({
         name: "user-edit",
         params: { id },
-        query: { id, type: "client" },
+        query: { tab: "client", clientId: id, type: "client" },
       });
     },
 
@@ -190,6 +239,7 @@ export default {
             text: response.data.message,
             icon: "success",
           });
+          this.getClients();
         }
       } catch (error) {
         this.handleError(error);
@@ -205,13 +255,13 @@ export default {
             text: response.data.message,
             icon: "success",
           });
+          this.getClients();
         }
       } catch (error) {
         this.handleError(error);
       }
     },
 
-    // Error handling
     handleError(error) {
       if (
         error.response &&
@@ -230,5 +280,3 @@ export default {
   },
 };
 </script>
-
-<style scoped></style>

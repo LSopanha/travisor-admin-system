@@ -9,7 +9,10 @@
       </div>
     </v-card-title>
 
-    <v-card max-width="400" class="mx-auto py-4 px-4 primary text-center">
+    <v-card
+      max-width="400"
+      class="mx-auto py-4 px-4 primary lighten-1 text-center"
+    >
       <!-- Wrapping avatar and name in a row with justify-center -->
       <v-row justify="center" class="pt-5">
         <v-avatar class="mb-4" size="120">

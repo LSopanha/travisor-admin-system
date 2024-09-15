@@ -163,39 +163,10 @@ export default {
       this.$emit("edit-click", id);
     },
     async onDeactivateClick(id) {
-      this.updateItemStatus(id, 0, "deactivate-click");
+      this.$emit("deactivate-click", id, 0);
     },
     async onActivateClick(id) {
-      this.updateItemStatus(id, 1, "activate-click");
-    },
-    async updateItemStatus(id, status, event) {
-      const index = this.items.findIndex((item) => item.global_id === id);
-      if (index !== -1) {
-        this.$set(this.items, index, { ...this.items[index], loading: true });
-        try {
-          this.$emit(event, id);
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          this.$set(this.items, index, {
-            ...this.items[index],
-            active: status,
-            loading: false,
-          });
-        } catch (error) {
-          console.error("Error updating item:", error);
-          this.$set(this.items, index, {
-            ...this.items[index],
-            loading: false,
-          });
-        }
-      }
-    },
-  },
-  watch: {
-    items: {
-      handler(newItems) {
-        console.log("Items updated:", newItems);
-      },
-      deep: true,
+      this.$emit("activate-click", id, 1);
     },
   },
 };

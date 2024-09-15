@@ -112,7 +112,7 @@
           <v-col cols="12" md="12">
             <v-text-field
               v-model="formData.profile_picture"
-              :counter="255"
+              :counter="500"
               :rules="profileRules"
               label="Profile Picture"
             ></v-text-field>
@@ -184,8 +184,8 @@ export default {
       ],
       profileRules: [
         (value) =>
-          value?.length <= 255 ||
-          "Profile picture URL must be less than 255 characters.",
+          value?.length <= 500 ||
+          "Profile picture URL must be less than 500 characters.",
       ],
     };
   },

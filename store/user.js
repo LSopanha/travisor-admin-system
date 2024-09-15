@@ -56,33 +56,12 @@ export const useUserStore = defineStore('user', {
     },
     async deactivateUser(api, id) {
       const response = await this.$axios.put(`${api}/${id}/deactivate`);
-      // const index = 0;
-      // if (api === "clients") {
-      //   index = this.clients.findIndex(user => user.global_id === id);
-      // } else if (api === "admins") {
-      //   index = this.admins.findIndex(user => user.global_id === id);
-      // }
-      // if (index !== -1) {
-      //   this.users[index].active = 0;
-      // }
       return response;
     },
     async activateUser(api, id) {
       const response = await this.$axios.put(`${api}/${id}/activate`);
-      // const index = 0;
-      // if (api === "clients") {
-      //   index = this.clients.findIndex(user => user.global_id === id);
-      // } else if (api === "admins") {
-      //   index = this.admins.findIndex(user => user.global_id === id);
-      // }
-      // if (index !== -1) {
-      //   this.users[index].active = 1;
-      // }
       return response;
     },
   },
 
-  getters: {
-
-  }
 });
