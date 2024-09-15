@@ -1,0 +1,59 @@
+@font-face {
+   font-family: 'Kantumruy Pro';
+   src: url('/fonts/KantumruyPro-VariableFont_wght.ttf') format('truetype');
+   font-weight: 100 900;
+   font-style: normal;
+ }
+ 
+ @font-face {
+   font-family: 'Kantumruy Pro';
+   src: url('/fonts/KantumruyPro-Italic-VariableFont_wght.ttf') format('truetype');
+   font-weight: 100 900;
+   font-style: italic;
+ }
+ 
+ body, h1, h2, h3, h4, h5, h6, p, a, b, i, span, div, v-tab {
+   font-family: 'Kantumruy Pro', 'Roboto', sans-serif !important;
+ }
+ 
+ .v-menu__content {
+   box-shadow: none !important;
+   background-color: transparent !important;
+ }
+ 
+ .font-size-14 {
+   font-size: 14px !important;
+ }
+ 
+ .font-size-16 {
+   font-size: 16px !important;
+ }
+ 
+ .font-size-18 {
+   font-size: 18px !important;
+ }
+ 
+ .font-size-20 {
+   font-size: 20px !important;
+ }
+ 
+ .font-size-24 {
+   font-size: 24px !important;
+ }
+ 
+ .font-size-128 {
+   font-size: 128px !important;
+ }
+ 
+ .font-weight-600 {
+   font-weight: 600;
+ }
+ 
+ .margin-bottom-1 {
+   margin-bottom: 1px;
+ }
+ 
+ .border-accent-1 {
+   border: 2px solid #EFF1F3 !important;
+ }
+ 

@@ -29,6 +29,8 @@ export default {
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
+    '~/static/css/materialdesignicons.min.css',
+    '@/assets/css/main.css'
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
@@ -53,7 +55,7 @@ export default {
   modules: ['@nuxtjs/axios', '@pinia/nuxt'],
 
   axios: {
-    baseURL: 'https://api.example.com', // Replace with your API base URL
+    baseURL: 'http://localhost:8000/api/admin/auth/v1/', 
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
@@ -86,5 +88,10 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+  },
+
+  router: {
+    trailingSlash: false,
+    middleware: ['auth']
   }
 }

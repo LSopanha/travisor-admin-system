@@ -1,5 +1,14 @@
-import { createPinia } from 'pinia';
+import { createPinia, PiniaVuePlugin } from 'pinia';
+import Vue from 'vue';
 
-export default ({ app }) => {
-  app.pinia = createPinia();
+Vue.use(PiniaVuePlugin);
+
+export default (context, inject) => {
+  const pinia = createPinia();
+  context.app.pinia = pinia;
+  pinia.use(({ store }) => {
+    store.$axios = context.app.$axios;
+  });
+
+  inject('pinia', pinia);
 };
