@@ -42,6 +42,14 @@
               label="Profile Picture URL"
             ></v-text-field>
           </v-col>
+
+          <!-- Status -->
+          <v-col cols="12" md="6">
+            <v-switch
+              v-model="formData.active"
+              label="Status (Active)"
+            ></v-switch>
+          </v-col>
         </v-row>
         <v-row class="justify-end px-3 pt-5">
           <v-btn color="primary" @click="submitForm">Submit</v-btn>
@@ -52,7 +60,7 @@
 </template>
 
 <script>
-import { useContinentStore } from "~/store/continent"; 
+import { useContinentStore } from "~/store/continent";
 
 export default {
   data() {
@@ -62,6 +70,7 @@ export default {
         continent_name: "",
         description: "",
         profile_picture: "",
+        active: false,
       },
       // menu: false,
       continentNameRules: [
@@ -157,6 +166,7 @@ export default {
         this.formData.continent_name = data.continent_name || "";
         this.formData.description = data.description || "";
         this.formData.profile_picture = data.profile_picture || "";
+        this.formData.active = data.active || false;
       }
     },
   },

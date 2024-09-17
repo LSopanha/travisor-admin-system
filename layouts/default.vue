@@ -110,6 +110,11 @@ export default {
           title: "Blog",
           to: "/blog",
         },
+        {
+          icon: "mdi-send-circle",
+          title: "Message",
+          to: "/message",
+        },
       ],
       miniVariant: false,
       right: true,
