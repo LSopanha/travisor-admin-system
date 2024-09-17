@@ -12,13 +12,13 @@
     <v-form @submit.prevent="submitForm" ref="form">
       <v-container class="px-10 pb-10" fluid>
         <v-row>
-          <!-- Country Name -->
+          <!-- Destination Name -->
           <v-col cols="12" md="12">
             <v-text-field
-              v-model="formData.country_name"
+              v-model="formData.destination_name"
               :counter="50"
-              :rules="countryNameRules"
-              label="Country Name"
+              :rules="destinationNameRules"
+              label="Destination Name"
               required
             ></v-text-field>
           </v-col>
@@ -37,11 +37,26 @@
             ></v-select>
           </v-col>
 
+          <!-- Country -->
+          <v-col cols="12" md="12">
+            <v-select
+              v-model="formData.country_id"
+              :items="countryOptions"
+              item-text="country_name"
+              item-value="global_id"
+              label="Country"
+              :rules="countryRules"
+              required
+              :loading="countryOptions.length === 0"
+              :disabled="!formData.continent_id"
+            ></v-select>
+          </v-col>
+
           <!-- Description -->
           <v-col cols="12" md="12">
             <v-textarea
               v-model="formData.description"
-              :counter="500"
+              :counter="1000"
               :rules="descriptionRules"
               label="Description"
               required
@@ -78,28 +93,34 @@
 <script>
 import { useCountryStore } from "~/store/country";
 import { useContinentStore } from "~/store/continent";
+import { useDestinationStore } from "~/store/destination";
 
 export default {
   data() {
     return {
       countryStore: useCountryStore(),
       continentStore: useContinentStore(),
+      destinationStore: useDestinationStore(),
       formData: {
-        country_name: "",
+        destination_name: "",
         description: "",
         profile_picture: "",
         continent_id: "",
+        country_id: "",
         active: false,
       },
       continentOptions: [],
-      countryNameRules: [
+      countryOptions: [],
+      destinationNameRules: [
         (value) =>
-          value?.length <= 50 || "Country name is limited to 50 characters.",
+          value?.length <= 50 ||
+          "Destination name is limited to 50 characters.",
       ],
       continentRules: [(value) => !!value || "Continent is required."],
+      countryRules: [(value) => !!value || "Country is required."],
       descriptionRules: [
         (value) =>
-          value?.length <= 500 || "Description is limited to 500 characters.",
+          value?.length <= 1000 || "Description is limited to 1000 characters.",
       ],
       profileRules: [
         (value) =>
@@ -131,10 +152,20 @@ export default {
         this.populateForm(newData);
       },
     },
+    "formData.continent_id": function (newVal) {
+      if (newVal) {
+        this.fetchCountriesByContinent(newVal);
+      } else {
+        this.countryOptions = [];
+      }
+    },
   },
 
   created() {
     this.getContinentOptions();
+    if (this.editMode) {
+      this.populateForm(this.existingData);
+    }
   },
 
   methods: {
@@ -144,7 +175,7 @@ export default {
         try {
           let response;
           if (this.editMode) {
-            response = await this.countryStore.updateCountry(
+            response = await this.destinationStore.updateDestination(
               this.existingData.global_id,
               this.formData
             );
@@ -158,7 +189,9 @@ export default {
                 this.$router.go(-1);
               });
           } else {
-            response = await this.countryStore.addCountry(this.formData);
+            response = await this.destinationStore.addDestination(
+              this.formData
+            );
             this.$swal
               .fire({
                 title: "Success!",
@@ -185,14 +218,21 @@ export default {
       }
     },
 
-    populateForm(data) {
+    async populateForm(data) {
       if (this.editMode && Object.keys(data).length > 0) {
-        this.formData.country_name = data.country_name || "";
+        this.formData.destination_name = data.destination_name || "";
         this.formData.description = data.description || "";
         this.formData.profile_picture = data.profile_picture || "";
         this.formData.continent_id =
           data.continent_id || data.continent?.global_id || "";
+        this.formData.country_id =
+          data.country_id || data.country?.global_id || "";
         this.formData.active = data.active || false;
+
+        // Fetch countries if continent is already selected
+        if (this.formData.continent_id) {
+          await this.fetchCountriesByContinent(this.formData.continent_id);
+        }
       }
     },
 
@@ -201,9 +241,27 @@ export default {
         const response = await this.continentStore.fetchContinents();
         if (response.status === 200 && response.data) {
           this.continentOptions = response.data.data;
+
+          // Fetch countries if continent is already set in edit mode
+          if (this.editMode && this.formData.continent_id) {
+            await this.fetchCountriesByContinent(this.formData.continent_id);
+          }
         }
       } catch (error) {
         console.error("Error fetching continents:", error);
+      }
+    },
+
+    async fetchCountriesByContinent(continentId) {
+      try {
+        const response = await this.countryStore.fetchCountriesByContinent(
+          continentId
+        );
+        if (response.status === 200 && response.data) {
+          this.countryOptions = response.data.data;
+        }
+      } catch (error) {
+        console.error("Error fetching countries:", error);
       }
     },
   },

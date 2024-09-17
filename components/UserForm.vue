@@ -131,6 +131,14 @@
               required
             ></v-select>
           </v-col>
+
+          <!-- Status -->
+          <v-col cols="12" md="6">
+            <v-switch
+              v-model="formData.active"
+              label="Status (Active)"
+            ></v-switch>
+          </v-col>
         </v-row>
         <v-row class="justify-end px-3 pt-5">
           <v-btn color="primary" @click="submitForm">Submit</v-btn>
@@ -160,6 +168,7 @@ export default {
         password: "",
         role_id: "",
         profile_picture: "",
+        active: false,
       },
       menu: false,
       genderOptions: ["Male", "Female"],
@@ -315,6 +324,7 @@ export default {
         this.formData.phone = data.phone || "";
         this.formData.profile_picture = data.profile_picture || "";
         this.formData.role_id = data.role.global_id;
+        this.formData.active = data.active || false;
       }
     },
 
