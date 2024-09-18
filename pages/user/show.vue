@@ -25,7 +25,7 @@ export default {
   },
 
   async created() {
-    const id = this.$route.query.id;
+    const id = this.$route.params.id;
     const type = this.$route.query.type;
 
     await this.fetchUserDetails(id, `${type}s`);
