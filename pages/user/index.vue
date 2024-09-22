@@ -5,7 +5,6 @@
         User Management
       </h2>
 
-      <!-- Chip group to toggle between Admin and Client -->
       <v-chip-group
         mandatory
         active-class="primary--text"
@@ -81,6 +80,7 @@ export default {
         { text: "Status", value: "active" },
       ],
       isLoading: true,
+      defaultProfilePicture: "/images/default-profile-picture.PNG", // Add a default picture URL here
     };
   },
 
@@ -114,14 +114,20 @@ export default {
       admins: "admins",
     }),
 
+    // Add logic to provide default profile picture if none exists
     adminsWithIds() {
-      return this.admins.map((admin, index) => ({ ...admin, id: index + 1 }));
+      return this.admins.map((admin, index) => ({
+        ...admin,
+        id: index + 1,
+        profile_picture: admin.profile_picture || this.defaultProfilePicture, // Use default picture if empty
+      }));
     },
 
     clientsWithIds() {
       return this.clients.map((client, index) => ({
         ...client,
         id: index + 1,
+        profile_picture: client.profile_picture || this.defaultProfilePicture,
       }));
     },
   },
@@ -171,7 +177,7 @@ export default {
       this.$router.push({
         name: "user-edit",
         params: { id },
-        query: { tab: "admin", adminId: id, type: "admin" },
+        query: { tab: "admin", id: id, type: "admin" },
       });
     },
 
@@ -226,7 +232,7 @@ export default {
       this.$router.push({
         name: "user-edit",
         params: { id },
-        query: { tab: "client", clientId: id, type: "client" },
+        query: { tab: "client", id: id, type: "client" },
       });
     },
 

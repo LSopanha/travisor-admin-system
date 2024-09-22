@@ -36,7 +36,9 @@ export default {
     this.userType = userType;
 
     const userId = this.$route.query.id;
-    this.getUser(userType, userId);
+    if (userId) {
+      this.getUser(userType, userId);
+    }
   },
   methods: {
     async getUser(userType, userId) {
